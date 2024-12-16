@@ -344,8 +344,45 @@ function getBalanceIndex(arr) {
  *          [10, 9,  8,  7]
  *        ]
  */
-function getSpiralMatrix(/* size */) {
-  throw new Error('Not implemented');
+function getSpiralMatrix(size) {
+  const matrix = [];
+  for (let i = 0; i < size; i += 1) {
+    matrix[i] = [];
+    for (let j = 0; j < size; j += 1) {
+      matrix[i][j] = 0;
+    }
+  }
+
+  const dRow = [0, 1, 0, -1];
+  const dCol = [1, 0, -1, 0];
+  let dir = 0;
+
+  let row = 0;
+  let col = 0;
+  let num = 1;
+
+  while (num <= size * size) {
+    matrix[row][col] = num;
+    num += 1;
+
+    const nextRow = row + dRow[dir];
+    const nextCol = col + dCol[dir];
+
+    if (
+      nextRow < 0 ||
+      nextRow >= size ||
+      nextCol < 0 ||
+      nextCol >= size ||
+      matrix[nextRow][nextCol] !== 0
+    ) {
+      dir = (dir + 1) % 4;
+    }
+
+    row += dRow[dir];
+    col += dCol[dir];
+  }
+
+  return matrix;
 }
 
 /**
@@ -363,8 +400,32 @@ function getSpiralMatrix(/* size */) {
  *    [7, 8, 9]         [9, 6, 3]
  *  ]                 ]
  */
-function rotateMatrix(/* matrix */) {
-  throw new Error('Not implemented');
+function rotateMatrix(matrix) {
+  const n = matrix.length;
+  const matrixRotate = matrix;
+  for (let i = 0; i < n; i += 1) {
+    for (let j = i + 1; j < n; j += 1) {
+      const temp = matrixRotate[i][j];
+      matrixRotate[i][j] = matrixRotate[j][i];
+      matrixRotate[j][i] = temp;
+    }
+  }
+
+  for (let i = 0; i < n; i += 1) {
+    let left = 0;
+    let right = n - 1;
+
+    while (left < right) {
+      const temp = matrixRotate[i][left];
+      matrixRotate[i][left] = matrixRotate[i][right];
+      matrixRotate[i][right] = temp;
+
+      left += 1;
+      right -= 1;
+    }
+  }
+
+  return matrix;
 }
 
 /**
@@ -381,8 +442,32 @@ function rotateMatrix(/* matrix */) {
  *  [2, 9, 5, 9]    => [2, 5, 9, 9]
  *  [-2, 9, 5, -3]  => [-3, -2, 5, 9]
  */
-function sortByAsc(/* arr */) {
-  throw new Error('Not implemented');
+function sortByAsc(arr) {
+  function partition(array, left, right) {
+    const pivot = array[right];
+    let i = left;
+    const result = [...array]; // Создаём копию массива для работы
+
+    for (let j = left; j < right; j += 1) {
+      if (result[j] < pivot) {
+        [result[i], result[j]] = [result[j], result[i]]; // Обмен через деструктуризацию
+        i += 1;
+      }
+    }
+
+    [result[i], result[right]] = [result[right], result[i]]; // Перемещаем pivot
+    return [i, result];
+  }
+
+  function quickSort(array, left, right) {
+    if (left >= right) return array;
+
+    const [pivotIndex, modifiedArray] = partition(array, left, right);
+    const leftSorted = quickSort(modifiedArray, left, pivotIndex - 1);
+    return quickSort(leftSorted, pivotIndex + 1, right);
+  }
+
+  return quickSort([...arr], 0, arr.length - 1); // Работаем с копией массива
 }
 
 /**
