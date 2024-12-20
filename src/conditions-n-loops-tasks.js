@@ -443,31 +443,66 @@ function rotateMatrix(matrix) {
  *  [-2, 9, 5, -3]  => [-3, -2, 5, 9]
  */
 function sortByAsc(arr) {
-  function partition(array, left, right) {
-    const pivot = array[right];
-    let i = left;
-    const result = [...array]; // Создаём копию массива для работы
+  const arrayCopy = arr;
 
-    for (let j = left; j < right; j += 1) {
-      if (result[j] < pivot) {
-        [result[i], result[j]] = [result[j], result[i]]; // Обмен через деструктуризацию
+  function swap(index1, index2) {
+    const temp = arrayCopy[index1];
+    arrayCopy[index1] = arrayCopy[index2];
+    arrayCopy[index2] = temp;
+  }
+
+  function partition(low, high) {
+    const pivot = arrayCopy[high];
+    let i = low;
+
+    for (let j = low; j < high; j += 1) {
+      if (arrayCopy[j] < pivot) {
+        swap(i, j);
         i += 1;
       }
     }
 
-    [result[i], result[right]] = [result[right], result[i]]; // Перемещаем pivot
-    return [i, result];
+    swap(i, high);
+    return i;
   }
 
-  function quickSort(array, left, right) {
-    if (left >= right) return array;
+  function quickSort(start, end) {
+    const stack = new Array(arr.length * 2);
+    let top = -1;
 
-    const [pivotIndex, modifiedArray] = partition(array, left, right);
-    const leftSorted = quickSort(modifiedArray, left, pivotIndex - 1);
-    return quickSort(leftSorted, pivotIndex + 1, right);
+    top += 1;
+    stack[top] = start;
+    top += 1;
+    stack[top] = end;
+
+    while (top >= 0) {
+      const currentEnd = stack[top];
+      top -= 1;
+      const currentStart = stack[top];
+      top -= 1;
+
+      if (currentStart < currentEnd) {
+        const pivotIndex = partition(currentStart, currentEnd);
+
+        if (pivotIndex - 1 > currentStart) {
+          top += 1;
+          stack[top] = currentStart;
+          top += 1;
+          stack[top] = pivotIndex - 1;
+        }
+
+        if (pivotIndex + 1 < currentEnd) {
+          top += 1;
+          stack[top] = pivotIndex + 1;
+          top += 1;
+          stack[top] = currentEnd;
+        }
+      }
+    }
   }
 
-  return quickSort([...arr], 0, arr.length - 1); // Работаем с копией массива
+  quickSort(0, arrayCopy.length - 1);
+  return arrayCopy;
 }
 
 /**
@@ -487,8 +522,42 @@ function sortByAsc(arr) {
  *  '012345', 3 => '024135' => '043215' => '031425'
  *  'qwerty', 3 => 'qetwry' => 'qtrewy' => 'qrwtey'
  */
-function shuffleChar(/* str, iterations */) {
-  throw new Error('Not implemented');
+function shuffleChar(str, iterations) {
+  const n = str.length;
+  if (n <= 1 || iterations === 0) return str;
+
+  const current = [];
+  for (let i = 0; i < n; i += 1) {
+    current[i] = str[i];
+  }
+
+  const buffer = new Array(n);
+
+  for (let it = 0; it < iterations; it += 1) {
+    let evenIndex = 0;
+    let oddIndex = Math.floor((n + 1) / 2);
+
+    for (let i = 0; i < n; i += 1) {
+      if (i % 2 === 0) {
+        buffer[evenIndex] = current[i];
+        evenIndex += 1;
+      } else {
+        buffer[oddIndex] = current[i];
+        oddIndex += 1;
+      }
+    }
+
+    for (let i = 0; i < n; i += 1) {
+      current[i] = buffer[i];
+    }
+  }
+
+  let result = '';
+  for (let i = 0; i < n; i += 1) {
+    result += current[i];
+  }
+
+  return result;
 }
 
 /**
